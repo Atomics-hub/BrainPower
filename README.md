@@ -33,22 +33,18 @@ A comprehensive Python script for real-time EEG data streaming, processing, and 
 #### **Training Your Personal Mind Reader**
 
 ```bash
-# Train individual thought classes
-python train_mind_reader.py --port COM3 --thought-class left_hand
-python train_mind_reader.py --port COM3 --thought-class right_hand
+# Use the GUI for easy training (recommended)
+python main/mind_reader_gui.py
 
-# Train ALL classes for complete mind reading (VIRAL CONTENT!)
-python train_mind_reader.py --port COM3 --train-all
-
-# Test your trained model
-python train_mind_reader.py --port COM3 --test-model
+# Or train via command line (advanced)
+python main/brain_calibrator.py --port COM3
 ```
 
 #### **Viral Demo Mode**
 
 ```bash
 # Perfect for YouTube videos!
-python demo_mind_reader.py --port COM3 --duration 120
+python main/demo_mind_reader.py --port COM3 --duration 120
 ```
 
 #### **Mind Reading Features**
@@ -116,22 +112,46 @@ python demo_mind_reader.py --port COM3 --duration 120
 - Music note generation counter
 - **Detailed performance logs**
 
+## 📁 Project Structure
+
+```
+BrainPower/
+├── main/                  # Core applications
+│   ├── openbci_stream.py # Main EEG streaming app
+│   ├── mind_reader_gui.py # Neural network training GUI
+│   ├── demo_mind_reader.py # Mind reading demo
+│   └── brain_calibrator.py # Brain state calibration
+├── tools/                 # Utilities and tools
+│   └── check_ports.py    # Serial port detection
+├── docs/                  # Documentation
+│   ├── README.md         # This file
+│   ├── LICENSE           # MIT License
+│   └── requirements.txt  # Python dependencies
+└── *.py                  # Additional utility scripts
+```
+
 ## 🚀 Installation
 
 1. **Clone this repository**
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Atomics-hub/BrainPower.git
 cd BrainPower
 ```
 
 2. **Install all dependencies**
 
 ```bash
-pip install -r requirements.txt
+pip install -r docs/requirements.txt
 ```
 
-3. **Optional: Set up Philips Hue** (for smart lighting)
+3. **Check your serial ports** (helpful for setup)
+
+```bash
+python tools/check_ports.py
+```
+
+4. **Optional: Set up Philips Hue** (for smart lighting)
    - Find your Hue bridge IP address
    - Press the bridge button before first connection
 
@@ -140,25 +160,25 @@ pip install -r requirements.txt
 ### **Basic Viral Mode** (AI + Music + Visualization)
 
 ```bash
-python openbci_stream.py --port COM3
+python main/openbci_stream.py --port COM3
 ```
 
 ### **Full Viral Mode** (Everything enabled!)
 
 ```bash
-python openbci_stream.py --port /dev/ttyUSB0 --enable-smart-home --hue-bridge-ip 192.168.1.100 --duration 300
+python main/openbci_stream.py --port /dev/ttyUSB0 --enable-smart-home --hue-bridge-ip 192.168.1.100 --duration 300
 ```
 
 ### **Silent Mode** (No music)
 
 ```bash
-python openbci_stream.py --port COM3 --disable-music
+python main/openbci_stream.py --port COM3 --disable-music
 ```
 
 ### **YouTube Demo Mode** (Perfect for recording)
 
 ```bash
-python openbci_stream.py --port COM3 --duration 60 --csv-path youtube_demo.csv
+python main/openbci_stream.py --port COM3 --duration 60 --csv-path youtube_demo.csv
 ```
 
 ## 🎛️ Command Line Arguments

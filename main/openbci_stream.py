@@ -1285,90 +1285,97 @@ class BrainStateClassifier:
     
     def _initialize_synthetic_model(self, n_channels: int, n_bands: int):
         """Initialize with synthetic training data for immediate functionality."""
-        try:
-            if self.is_personal_model:
-                logger.info("✅ Personal model already loaded, skipping synthetic initialization")
-                return
-                
-            # Generate synthetic training data based on EEG research patterns
-            n_samples = 1000
-            
-            # Synthetic data for different brain states
-            states = ['focused', 'relaxed', 'stressed', 'meditative', 'excited', 'drowsy', 'neutral']
-            
-            training_features = []
-            training_labels = []
-            
-            for state in states:
-                for _ in range(n_samples // len(states)):
-                    # Generate synthetic band power features
-                    features = self._generate_synthetic_features(state, n_channels, n_bands)
-                    training_features.append(features.flatten())
-                    training_labels.append(state)
-            
-            # Train the model
-            X = np.array(training_features)
-            y = np.array(training_labels)
-            
-            self.scaler.fit(X)
-            X_scaled = self.scaler.transform(X)
-            self.classifier.fit(X_scaled, y)
-            self.is_trained = True
-            self.expected_features = n_channels * n_bands
-            
-            logger.info(f"🤖 Synthetic brain state classifier initialized ({n_channels} channels, {n_bands} bands)")
-            
-        except Exception as e:
-            logger.error(f"Error initializing brain state classifier: {e}")
+        # DISABLED: No synthetic data generation in open source version
+        # try:
+        #     if self.is_personal_model:
+        #         logger.info("✅ Personal model already loaded, skipping synthetic initialization")
+        #         return
+        #         
+        #     # Generate synthetic training data based on EEG research patterns
+        #     n_samples = 1000
+        #     
+        #     # Synthetic data for different brain states
+        #     states = ['focused', 'relaxed', 'stressed', 'meditative', 'excited', 'drowsy', 'neutral']
+        #     
+        #     training_features = []
+        #     training_labels = []
+        #     
+        #     for state in states:
+        #         for _ in range(n_samples // len(states)):
+        #             # Generate synthetic band power features
+        #             features = self._generate_synthetic_features(state, n_channels, n_bands)
+        #             training_features.append(features.flatten())
+        #             training_labels.append(state)
+        #     
+        #     # Train the model
+        #     X = np.array(training_features)
+        #     y = np.array(training_labels)
+        #     
+        #     self.scaler.fit(X)
+        #     X_scaled = self.scaler.transform(X)
+        #     self.classifier.fit(X_scaled, y)
+        #     self.is_trained = True
+        #     self.expected_features = n_channels * n_bands
+        #     
+        #     logger.info(f"🤖 Synthetic brain state classifier initialized ({n_channels} channels, {n_bands} bands)")
+        #     
+        # except Exception as e:
+        #     logger.error(f"Error initializing brain state classifier: {e}")
+        
+        logger.info("❌ Synthetic model initialization disabled - requires real EEG training data")
     
     def _generate_synthetic_features(self, state: str, n_channels: int, n_bands: int) -> np.ndarray:
         """Generate synthetic band power features for a given brain state."""
-        features = np.random.random((n_channels, n_bands))
+        # DISABLED: No synthetic data generation in open source version
+        # features = np.random.random((n_channels, n_bands))
+        # 
+        # # Apply state-specific patterns based on EEG research
+        # if state == 'focused':
+        #     # Higher beta waves, moderate alpha
+        #     features[:, min(3, n_bands-1)] *= 2.0  # Beta (if available)
+        #     if n_bands > 2:
+        #         features[:, 2] *= 1.2  # Alpha
+        # elif state == 'relaxed':
+        #     # Higher alpha waves, lower beta
+        #     if n_bands > 2:
+        #         features[:, 2] *= 3.0  # Alpha
+        #     if n_bands > 3:
+        #         features[:, 3] *= 0.5  # Beta
+        # elif state == 'meditative':
+        #     # Higher theta and alpha, lower beta
+        #     if n_bands > 1:
+        #         features[:, 1] *= 2.5  # Theta
+        #     if n_bands > 2:
+        #         features[:, 2] *= 2.0  # Alpha
+        #     if n_bands > 3:
+        #         features[:, 3] *= 0.3  # Beta
+        # elif state == 'stressed':
+        #     # Higher beta and gamma, irregular patterns
+        #     if n_bands > 3:
+        #         features[:, 3] *= 2.5  # Beta
+        #     if n_bands > 4:
+        #         features[:, 4] *= 1.8  # Gamma
+        #     features += np.random.random(features.shape) * 0.5  # Add noise
+        # elif state == 'excited':
+        #     # Higher gamma and beta
+        #     if n_bands > 4:
+        #         features[:, 4] *= 2.2  # Gamma
+        #     if n_bands > 3:
+        #         features[:, 3] *= 1.8  # Beta
+        # elif state == 'drowsy':
+        #     # Higher delta and theta, lower beta and gamma
+        #     features[:, 0] *= 2.5  # Delta
+        #     if n_bands > 1:
+        #         features[:, 1] *= 1.8  # Theta
+        #     if n_bands > 3:
+        #         features[:, 3] *= 0.4  # Beta
+        #     if n_bands > 4:
+        #         features[:, 4] *= 0.3  # Gamma
+        # 
+        # return features
         
-        # Apply state-specific patterns based on EEG research
-        if state == 'focused':
-            # Higher beta waves, moderate alpha
-            features[:, min(3, n_bands-1)] *= 2.0  # Beta (if available)
-            if n_bands > 2:
-                features[:, 2] *= 1.2  # Alpha
-        elif state == 'relaxed':
-            # Higher alpha waves, lower beta
-            if n_bands > 2:
-                features[:, 2] *= 3.0  # Alpha
-            if n_bands > 3:
-                features[:, 3] *= 0.5  # Beta
-        elif state == 'meditative':
-            # Higher theta and alpha, lower beta
-            if n_bands > 1:
-                features[:, 1] *= 2.5  # Theta
-            if n_bands > 2:
-                features[:, 2] *= 2.0  # Alpha
-            if n_bands > 3:
-                features[:, 3] *= 0.3  # Beta
-        elif state == 'stressed':
-            # Higher beta and gamma, irregular patterns
-            if n_bands > 3:
-                features[:, 3] *= 2.5  # Beta
-            if n_bands > 4:
-                features[:, 4] *= 1.8  # Gamma
-            features += np.random.random(features.shape) * 0.5  # Add noise
-        elif state == 'excited':
-            # Higher gamma and beta
-            if n_bands > 4:
-                features[:, 4] *= 2.2  # Gamma
-            if n_bands > 3:
-                features[:, 3] *= 1.8  # Beta
-        elif state == 'drowsy':
-            # Higher delta and theta, lower beta and gamma
-            features[:, 0] *= 2.5  # Delta
-            if n_bands > 1:
-                features[:, 1] *= 1.8  # Theta
-            if n_bands > 3:
-                features[:, 3] *= 0.4  # Beta
-            if n_bands > 4:
-                features[:, 4] *= 0.3  # Gamma
-        
-        return features
+        import numpy as np
+        return np.zeros((n_channels, n_bands))  # Return empty array instead of synthetic data
     
     def predict_state(self, band_powers: np.ndarray) -> Tuple[str, float, Dict[str, float]]:
         """

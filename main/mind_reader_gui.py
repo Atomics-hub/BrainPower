@@ -84,7 +84,7 @@ class TrainingThread(QThread):
             
             # Regular BrainFlow path for real data
             # Import here to avoid circular imports
-            from openbci_stream import OpenBCIStreamer, apply_filters, compute_band_powers
+            from tools.openbci_stream import OpenBCIStreamer, apply_filters, compute_band_powers
             
             # Create streamer
             self.status_updated.emit("🔧 Connecting to OpenBCI...")
@@ -193,38 +193,42 @@ class TrainingThread(QThread):
     
     def _generate_synthetic_eeg_data(self):
         """Generate synthetic EEG data for training when real data isn't available."""
-        # Create realistic synthetic EEG data (16 channels, ~100 samples)
-        num_channels = 16
-        num_samples = 100  # About 0.8 seconds at 125 Hz
+        # DISABLED: No synthetic data generation in open source version
+        # # Create realistic synthetic EEG data (16 channels, ~100 samples)
+        # num_channels = 16
+        # num_samples = 100  # About 0.8 seconds at 125 Hz
+        # 
+        # # Generate realistic EEG patterns
+        # synthetic_eeg = np.random.normal(0, 50, (num_channels, num_samples))  # Baseline noise
+        # 
+        # # Add some realistic frequency components
+        # time_vec = np.linspace(0, 0.8, num_samples)
+        # 
+        # for ch in range(num_channels):
+        #     # Add alpha waves (8-12 Hz)
+        #     alpha_freq = 10 + np.random.uniform(-2, 2)
+        #     alpha_amplitude = np.random.uniform(20, 80)
+        #     synthetic_eeg[ch, :] += alpha_amplitude * np.sin(2 * np.pi * alpha_freq * time_vec)
+        #     
+        #     # Add beta waves (13-30 Hz) 
+        #     beta_freq = 20 + np.random.uniform(-5, 5)
+        #     beta_amplitude = np.random.uniform(10, 40)
+        #     synthetic_eeg[ch, :] += beta_amplitude * np.sin(2 * np.pi * beta_freq * time_vec)
+        #     
+        #     # Add some random spikes
+        #     for spike in range(np.random.randint(0, 3)):
+        #         spike_pos = np.random.randint(0, num_samples)
+        #         spike_width = np.random.randint(3, 8)
+        #         spike_amp = np.random.uniform(50, 150)
+        #         start_idx = max(0, spike_pos - spike_width)
+        #         end_idx = min(num_samples, spike_pos + spike_width)
+        #         synthetic_eeg[ch, start_idx:end_idx] += spike_amp
+        # 
+        # print(f"🎮 Generated synthetic EEG: {synthetic_eeg.shape}")
+        # return synthetic_eeg
         
-        # Generate realistic EEG patterns
-        synthetic_eeg = np.random.normal(0, 50, (num_channels, num_samples))  # Baseline noise
-        
-        # Add some realistic frequency components
-        time_vec = np.linspace(0, 0.8, num_samples)
-        
-        for ch in range(num_channels):
-            # Add alpha waves (8-12 Hz)
-            alpha_freq = 10 + np.random.uniform(-2, 2)
-            alpha_amplitude = np.random.uniform(20, 80)
-            synthetic_eeg[ch, :] += alpha_amplitude * np.sin(2 * np.pi * alpha_freq * time_vec)
-            
-            # Add beta waves (13-30 Hz) 
-            beta_freq = 20 + np.random.uniform(-5, 5)
-            beta_amplitude = np.random.uniform(10, 40)
-            synthetic_eeg[ch, :] += beta_amplitude * np.sin(2 * np.pi * beta_freq * time_vec)
-            
-            # Add some random spikes
-            for spike in range(np.random.randint(0, 3)):
-                spike_pos = np.random.randint(0, num_samples)
-                spike_width = np.random.randint(3, 8)
-                spike_amp = np.random.uniform(50, 150)
-                start_idx = max(0, spike_pos - spike_width)
-                end_idx = min(num_samples, spike_pos + spike_width)
-                synthetic_eeg[ch, start_idx:end_idx] += spike_amp
-        
-        print(f"🎮 Generated synthetic EEG: {synthetic_eeg.shape}")
-        return synthetic_eeg
+        print("❌ Synthetic data generation disabled - requires real EEG hardware")
+        return None
     
     def _run_training_sequence(self, quick_mode=False):
         """Run the complete training sequence."""
@@ -251,7 +255,7 @@ class TrainingThread(QThread):
             mind_reader = self.streamer.mind_reader if self.streamer else None
             if not mind_reader:
                 # If no streamer (synthetic mode), create a mind reader
-                from openbci_stream import MindReaderNN
+                from tools.openbci_stream import MindReaderNN
                 mind_reader = MindReaderNN()
             
             # Reset training samples storage
@@ -303,7 +307,7 @@ class TrainingThread(QThread):
                         
                         if window_data is not None:
                             # Process the data
-                            from openbci_stream import apply_filters, compute_band_powers
+                            from tools.openbci_stream import apply_filters, compute_band_powers
                             filtered_data = apply_filters(window_data, 125)  # Use standard 125 Hz
                             band_powers = compute_band_powers(filtered_data, 125)
                             
@@ -490,7 +494,7 @@ class TrainingThread(QThread):
         # For synthetic testing, we don't need the actual streamer
         if is_synthetic:
             # Load the trained model directly without streamer dependency
-            from openbci_stream import MindReaderNN
+            from tools.openbci_stream import MindReaderNN
             if not mind_reader:
                 mind_reader = MindReaderNN()
             
@@ -527,7 +531,7 @@ class TrainingThread(QThread):
             if window_data is not None:
                 try:
                     # Process data
-                    from openbci_stream import apply_filters, compute_band_powers
+                    from tools.openbci_stream import apply_filters, compute_band_powers
                     filtered_data = apply_filters(window_data, self.streamer.sampling_rate)
                     band_powers = compute_band_powers(filtered_data, self.streamer.sampling_rate)
                     
@@ -648,58 +652,63 @@ class TrainingThread(QThread):
     
     def _generate_varied_synthetic_data(self, prediction_count: int) -> np.ndarray:
         """Generate varied synthetic EEG band power data for realistic testing."""
-        np.random.seed(int(time.time() * 1000) % 10000)  # Time-based seed for variation
+        # DISABLED: No synthetic data generation in open source version
+        # np.random.seed(int(time.time() * 1000) % 10000)  # Time-based seed for variation
+        # 
+        # # Create 16 channels × 5 bands array
+        # band_powers = np.zeros((16, 5))
+        # 
+        # # Generate different patterns based on time/count to simulate different mental states
+        # pattern_type = prediction_count % 3  # Cycle through 3 different patterns
+        # 
+        # if pattern_type == 0:  # "left_hand" pattern
+        #     # Higher beta activity in motor cortex areas (C3, C4, Cz)
+        #     motor_channels = [8, 9, 10]  # C3, Cz, C4 indices
+        #     for ch in motor_channels:
+        #         band_powers[ch, 3] = np.random.uniform(15, 25)  # High beta
+        #         band_powers[ch, 2] = np.random.uniform(5, 10)   # Low alpha (ERD)
+        #     
+        #     # Background activity for other channels
+        #     for ch in range(16):
+        #         if ch not in motor_channels:
+        #             band_powers[ch, :] = np.random.uniform(2, 8, 5)
+        #             
+        # elif pattern_type == 1:  # "right_hand" pattern  
+        #     # Similar to left_hand but slightly different pattern
+        #     motor_channels = [8, 9, 10]  # C3, Cz, C4
+        #     for ch in motor_channels:
+        #         band_powers[ch, 3] = np.random.uniform(12, 22)  # High beta
+        #         band_powers[ch, 2] = np.random.uniform(3, 8)    # Low alpha
+        #         band_powers[ch, 4] = np.random.uniform(3, 6)    # Some gamma
+        #     
+        #     # Background activity
+        #     for ch in range(16):
+        #         if ch not in motor_channels:
+        #             band_powers[ch, :] = np.random.uniform(1, 7, 5)
+        #             
+        # else:  # "rest" pattern
+        #     # More relaxed pattern with higher alpha
+        #     for ch in range(16):
+        #         band_powers[ch, 0] = np.random.uniform(3, 8)   # Delta
+        #         band_powers[ch, 1] = np.random.uniform(4, 10)  # Theta  
+        #         band_powers[ch, 2] = np.random.uniform(10, 20) # High alpha (relaxed)
+        #         band_powers[ch, 3] = np.random.uniform(2, 6)   # Low beta
+        #         band_powers[ch, 4] = np.random.uniform(1, 4)   # Low gamma
+        # 
+        # # Add some random noise to make it more realistic
+        # noise = np.random.uniform(-1, 1, band_powers.shape)
+        # band_powers += noise
+        # 
+        # # Ensure positive values
+        # band_powers = np.maximum(band_powers, 0.1)
+        # 
+        # print(f"🎮 Generated synthetic pattern {pattern_type} - variation {prediction_count}")
+        # 
+        # return band_powers
         
-        # Create 16 channels × 5 bands array
-        band_powers = np.zeros((16, 5))
-        
-        # Generate different patterns based on time/count to simulate different mental states
-        pattern_type = prediction_count % 3  # Cycle through 3 different patterns
-        
-        if pattern_type == 0:  # "left_hand" pattern
-            # Higher beta activity in motor cortex areas (C3, C4, Cz)
-            motor_channels = [8, 9, 10]  # C3, Cz, C4 indices
-            for ch in motor_channels:
-                band_powers[ch, 3] = np.random.uniform(15, 25)  # High beta
-                band_powers[ch, 2] = np.random.uniform(5, 10)   # Low alpha (ERD)
-            
-            # Background activity for other channels
-            for ch in range(16):
-                if ch not in motor_channels:
-                    band_powers[ch, :] = np.random.uniform(2, 8, 5)
-                    
-        elif pattern_type == 1:  # "right_hand" pattern  
-            # Similar to left_hand but slightly different pattern
-            motor_channels = [8, 9, 10]  # C3, Cz, C4
-            for ch in motor_channels:
-                band_powers[ch, 3] = np.random.uniform(12, 22)  # High beta
-                band_powers[ch, 2] = np.random.uniform(3, 8)    # Low alpha
-                band_powers[ch, 4] = np.random.uniform(3, 6)    # Some gamma
-            
-            # Background activity
-            for ch in range(16):
-                if ch not in motor_channels:
-                    band_powers[ch, :] = np.random.uniform(1, 7, 5)
-                    
-        else:  # "rest" pattern
-            # More relaxed pattern with higher alpha
-            for ch in range(16):
-                band_powers[ch, 0] = np.random.uniform(3, 8)   # Delta
-                band_powers[ch, 1] = np.random.uniform(4, 10)  # Theta  
-                band_powers[ch, 2] = np.random.uniform(10, 20) # High alpha (relaxed)
-                band_powers[ch, 3] = np.random.uniform(2, 6)   # Low beta
-                band_powers[ch, 4] = np.random.uniform(1, 4)   # Low gamma
-        
-        # Add some random noise to make it more realistic
-        noise = np.random.uniform(-1, 1, band_powers.shape)
-        band_powers += noise
-        
-        # Ensure positive values
-        band_powers = np.maximum(band_powers, 0.1)
-        
-        print(f"🎮 Generated synthetic pattern {pattern_type} - variation {prediction_count}")
-        
-        return band_powers
+        import numpy as np
+        print("❌ Synthetic data generation disabled - requires real EEG hardware")
+        return np.zeros((16, 5))  # Return empty array instead of synthetic data
 
 class NeuralNetworkWidget(QWidget):
     """Widget to visualize the neural network structure and LIVE activity."""
@@ -1108,7 +1117,7 @@ class TrainingProgressWidget(QWidget):
     
     def update_progress(self, thought_class: str, samples_collected: int, total_samples: int):
         """Update training progress."""
-        from openbci_stream import MIND_READING_EMOJIS
+        from tools.openbci_stream import MIND_READING_EMOJIS
         
         emoji = MIND_READING_EMOJIS.get(thought_class, '🧠')
         self.current_class_label.setText(f"Training: {emoji} {thought_class.upper()}")
@@ -1174,7 +1183,7 @@ class PredictionsWidget(QWidget):
     
     def create_probability_bars(self, layout):
         """Create probability bars for each thought class."""
-        from openbci_stream import MIND_READING_EMOJIS, MIND_READING_COLORS
+        from tools.openbci_stream import MIND_READING_EMOJIS, MIND_READING_COLORS
         
         # UPDATED: Only show the 3 classes we're actually training on
         thought_classes = ['left_hand', 'right_hand', 'rest']
@@ -1224,7 +1233,7 @@ class PredictionsWidget(QWidget):
     
     def update_prediction(self, thought: str, confidence: float, probabilities: Dict[str, float]):
         """Update the current prediction display."""
-        from openbci_stream import MIND_READING_EMOJIS
+        from tools.openbci_stream import MIND_READING_EMOJIS
         
         # DEBUG: Print received prediction
         print(f"🎯 GUI UPDATE: Received prediction - {thought} ({confidence:.2f})")
@@ -1776,135 +1785,147 @@ class MindReaderGUI(QMainWindow):
     
     def _update_demo(self):
         """Update demo with fake predictions for content creation."""
-        import random
-        from openbci_stream import MIND_READING_EMOJIS
+        # DISABLED: No synthetic/fake data generation in open source version
+        # import random
+        # from tools.openbci_stream import MIND_READING_EMOJIS
+        # 
+        # # FIXED: Only use the 3 classes we actually trained on
+        # thoughts = ['left_hand', 'right_hand', 'rest']
+        # thought = random.choice(thoughts)
+        # confidence = random.uniform(0.4, 0.9)
+        # 
+        # # Create fake probabilities for ONLY the 3 trained classes
+        # probabilities = {}
+        # for t in thoughts:
+        #     if t == thought:
+        #         probabilities[t] = confidence
+        #     else:
+        #         probabilities[t] = random.uniform(0.0, 1.0 - confidence) / len(thoughts)
+        # 
+        # # UPDATE PREDICTIONS
+        # self.predictions_widget.update_prediction(thought, confidence, probabilities)
+        # 
+        # # GENERATE SYNTHETIC EEG DATA FOR VIRAL DEMO
+        # # Generate realistic EEG band powers (16 channels × 5 bands)
+        # synthetic_band_powers = self._generate_demo_band_powers(thought, confidence)
+        # 
+        # # Generate raw EEG data for live channels display
+        # synthetic_eeg_data = self._generate_demo_eeg_data(thought)
+        # 
+        # # UPDATE ALL VISUALIZATIONS
+        # self.band_power_widget.update_band_powers(synthetic_band_powers)
+        # self.eeg_channels_widget.update_eeg_data(synthetic_eeg_data)
+        # self.network_widget.update_live_prediction(thought, confidence, synthetic_band_powers)
+        # 
+        # # Update status to show what's happening
+        # self.status_label.setText(f"🎬 VIRAL DEMO: Predicting {thought} ({confidence:.1%} confidence)")
         
-        # FIXED: Only use the 3 classes we actually trained on
-        thoughts = ['left_hand', 'right_hand', 'rest']
-        thought = random.choice(thoughts)
-        confidence = random.uniform(0.4, 0.9)
-        
-        # Create fake probabilities for ONLY the 3 trained classes
-        probabilities = {}
-        for t in thoughts:
-            if t == thought:
-                probabilities[t] = confidence
-            else:
-                probabilities[t] = random.uniform(0.0, 1.0 - confidence) / len(thoughts)
-        
-        # UPDATE PREDICTIONS
-        self.predictions_widget.update_prediction(thought, confidence, probabilities)
-        
-        # GENERATE SYNTHETIC EEG DATA FOR VIRAL DEMO
-        # Generate realistic EEG band powers (16 channels × 5 bands)
-        synthetic_band_powers = self._generate_demo_band_powers(thought, confidence)
-        
-        # Generate raw EEG data for live channels display
-        synthetic_eeg_data = self._generate_demo_eeg_data(thought)
-        
-        # UPDATE ALL VISUALIZATIONS
-        self.band_power_widget.update_band_powers(synthetic_band_powers)
-        self.eeg_channels_widget.update_eeg_data(synthetic_eeg_data)
-        self.network_widget.update_live_prediction(thought, confidence, synthetic_band_powers)
-        
-        # Update status to show what's happening
-        self.status_label.setText(f"🎬 VIRAL DEMO: Predicting {thought} ({confidence:.1%} confidence)")
+        # Update status to show demo is disabled
+        self.status_label.setText("❌ Demo mode disabled - requires real EEG hardware for data")
     
     def _generate_demo_band_powers(self, thought: str, confidence: float) -> np.ndarray:
         """Generate realistic synthetic EEG band powers for viral demo."""
+        # DISABLED: No synthetic data generation in open source version
+        # import numpy as np
+        # 
+        # # Create 16 channels × 5 bands array
+        # band_powers = np.zeros((16, 5))
+        # 
+        # # Generate different patterns based on the predicted thought
+        # if thought == 'left_hand':
+        #     # Higher beta activity in motor cortex areas (simulate left hand movement)
+        #     motor_channels = [8, 9, 10]  # C3, Cz, C4 indices
+        #     for ch in motor_channels:
+        #         band_powers[ch, 3] = np.random.uniform(15, 25) * confidence  # High beta
+        #         band_powers[ch, 2] = np.random.uniform(3, 8)   # Low alpha (ERD)
+        #         band_powers[ch, 4] = np.random.uniform(2, 5)   # Some gamma
+        #     
+        #     # Background activity for other channels
+        #     for ch in range(16):
+        #         if ch not in motor_channels:
+        #             band_powers[ch, :] = np.random.uniform(2, 8, 5)
+        #             
+        # elif thought == 'right_hand':
+        #     # Similar to left_hand but with slightly different pattern
+        #     motor_channels = [8, 9, 10]  # C3, Cz, C4
+        #     for ch in motor_channels:
+        #         band_powers[ch, 3] = np.random.uniform(12, 22) * confidence  # High beta
+        #         band_powers[ch, 2] = np.random.uniform(2, 7)    # Low alpha
+        #         band_powers[ch, 4] = np.random.uniform(3, 7)    # More gamma than left
+        #     
+        #     # Background activity
+        #     for ch in range(16):
+        #         if ch not in motor_channels:
+        #             band_powers[ch, :] = np.random.uniform(1, 7, 5)
+        #             
+        # else:  # 'rest' pattern
+        #     # More relaxed pattern with higher alpha across all channels
+        #     for ch in range(16):
+        #         band_powers[ch, 0] = np.random.uniform(3, 8)   # Delta
+        #         band_powers[ch, 1] = np.random.uniform(4, 10)  # Theta  
+        #         band_powers[ch, 2] = np.random.uniform(12, 22) # High alpha (relaxed)
+        #         band_powers[ch, 3] = np.random.uniform(2, 6)   # Low beta
+        #         band_powers[ch, 4] = np.random.uniform(1, 4)   # Low gamma
+        # 
+        # # Add some realistic noise and ensure positive values
+        # noise = np.random.uniform(-1, 1, band_powers.shape)
+        # band_powers += noise
+        # band_powers = np.maximum(band_powers, 0.1)
+        # 
+        # return band_powers
+        
         import numpy as np
-        
-        # Create 16 channels × 5 bands array
-        band_powers = np.zeros((16, 5))
-        
-        # Generate different patterns based on the predicted thought
-        if thought == 'left_hand':
-            # Higher beta activity in motor cortex areas (simulate left hand movement)
-            motor_channels = [8, 9, 10]  # C3, Cz, C4 indices
-            for ch in motor_channels:
-                band_powers[ch, 3] = np.random.uniform(15, 25) * confidence  # High beta
-                band_powers[ch, 2] = np.random.uniform(3, 8)   # Low alpha (ERD)
-                band_powers[ch, 4] = np.random.uniform(2, 5)   # Some gamma
-            
-            # Background activity for other channels
-            for ch in range(16):
-                if ch not in motor_channels:
-                    band_powers[ch, :] = np.random.uniform(2, 8, 5)
-                    
-        elif thought == 'right_hand':
-            # Similar to left_hand but with slightly different pattern
-            motor_channels = [8, 9, 10]  # C3, Cz, C4
-            for ch in motor_channels:
-                band_powers[ch, 3] = np.random.uniform(12, 22) * confidence  # High beta
-                band_powers[ch, 2] = np.random.uniform(2, 7)    # Low alpha
-                band_powers[ch, 4] = np.random.uniform(3, 7)    # More gamma than left
-            
-            # Background activity
-            for ch in range(16):
-                if ch not in motor_channels:
-                    band_powers[ch, :] = np.random.uniform(1, 7, 5)
-                    
-        else:  # 'rest' pattern
-            # More relaxed pattern with higher alpha across all channels
-            for ch in range(16):
-                band_powers[ch, 0] = np.random.uniform(3, 8)   # Delta
-                band_powers[ch, 1] = np.random.uniform(4, 10)  # Theta  
-                band_powers[ch, 2] = np.random.uniform(12, 22) # High alpha (relaxed)
-                band_powers[ch, 3] = np.random.uniform(2, 6)   # Low beta
-                band_powers[ch, 4] = np.random.uniform(1, 4)   # Low gamma
-        
-        # Add some realistic noise and ensure positive values
-        noise = np.random.uniform(-1, 1, band_powers.shape)
-        band_powers += noise
-        band_powers = np.maximum(band_powers, 0.1)
-        
-        return band_powers
+        return np.zeros((16, 5))  # Return empty array instead of synthetic data
     
     def _generate_demo_eeg_data(self, thought: str) -> np.ndarray:
         """Generate synthetic raw EEG data for live channels display."""
+        # DISABLED: No synthetic data generation in open source version
+        # import numpy as np
+        # 
+        # # Create realistic synthetic EEG data (16 channels, ~100 samples)
+        # num_channels = 16
+        # num_samples = 100  # About 0.8 seconds at 125 Hz
+        # 
+        # # Generate realistic EEG patterns
+        # synthetic_eeg = np.random.normal(0, 30, (num_channels, num_samples))  # Baseline noise
+        # 
+        # # Add realistic frequency components based on the thought
+        # time_vec = np.linspace(0, 0.8, num_samples)
+        # 
+        # for ch in range(num_channels):
+        #     # Motor channels get special treatment for hand movements
+        #     if ch in [8, 9, 10] and thought != 'rest':  # C3, Cz, C4 for hand movements
+        #         # Add stronger beta oscillations for motor imagery
+        #         beta_freq = 20 + np.random.uniform(-3, 3)
+        #         beta_amplitude = np.random.uniform(40, 80)  # Stronger for motor
+        #         synthetic_eeg[ch, :] += beta_amplitude * np.sin(2 * np.pi * beta_freq * time_vec)
+        #         
+        #         # Add motor-related gamma bursts
+        #         gamma_freq = 35 + np.random.uniform(-5, 5)
+        #         gamma_amplitude = np.random.uniform(15, 30)
+        #         synthetic_eeg[ch, :] += gamma_amplitude * np.sin(2 * np.pi * gamma_freq * time_vec)
+        #         
+        #     else:
+        #         # Regular alpha waves for all channels
+        #         alpha_freq = 10 + np.random.uniform(-2, 2)
+        #         alpha_amplitude = np.random.uniform(20, 60)
+        #         if thought == 'rest':
+        #             alpha_amplitude *= 1.5  # Stronger alpha during rest
+        #         synthetic_eeg[ch, :] += alpha_amplitude * np.sin(2 * np.pi * alpha_freq * time_vec)
+        #     
+        #     # Add some random spikes for realism
+        #     for spike in range(np.random.randint(0, 2)):
+        #         spike_pos = np.random.randint(0, num_samples)
+        #         spike_width = np.random.randint(2, 5)
+        #         spike_amp = np.random.uniform(30, 100)
+        #         start_idx = max(0, spike_pos - spike_width)
+        #         end_idx = min(num_samples, spike_pos + spike_width)
+        #         synthetic_eeg[ch, start_idx:end_idx] += spike_amp
+        # 
+        # return synthetic_eeg
+        
         import numpy as np
-        
-        # Create realistic synthetic EEG data (16 channels, ~100 samples)
-        num_channels = 16
-        num_samples = 100  # About 0.8 seconds at 125 Hz
-        
-        # Generate realistic EEG patterns
-        synthetic_eeg = np.random.normal(0, 30, (num_channels, num_samples))  # Baseline noise
-        
-        # Add realistic frequency components based on the thought
-        time_vec = np.linspace(0, 0.8, num_samples)
-        
-        for ch in range(num_channels):
-            # Motor channels get special treatment for hand movements
-            if ch in [8, 9, 10] and thought != 'rest':  # C3, Cz, C4 for hand movements
-                # Add stronger beta oscillations for motor imagery
-                beta_freq = 20 + np.random.uniform(-3, 3)
-                beta_amplitude = np.random.uniform(40, 80)  # Stronger for motor
-                synthetic_eeg[ch, :] += beta_amplitude * np.sin(2 * np.pi * beta_freq * time_vec)
-                
-                # Add motor-related gamma bursts
-                gamma_freq = 35 + np.random.uniform(-5, 5)
-                gamma_amplitude = np.random.uniform(15, 30)
-                synthetic_eeg[ch, :] += gamma_amplitude * np.sin(2 * np.pi * gamma_freq * time_vec)
-                
-            else:
-                # Regular alpha waves for all channels
-                alpha_freq = 10 + np.random.uniform(-2, 2)
-                alpha_amplitude = np.random.uniform(20, 60)
-                if thought == 'rest':
-                    alpha_amplitude *= 1.5  # Stronger alpha during rest
-                synthetic_eeg[ch, :] += alpha_amplitude * np.sin(2 * np.pi * alpha_freq * time_vec)
-            
-            # Add some random spikes for realism
-            for spike in range(np.random.randint(0, 2)):
-                spike_pos = np.random.randint(0, num_samples)
-                spike_width = np.random.randint(2, 5)
-                spike_amp = np.random.uniform(30, 100)
-                start_idx = max(0, spike_pos - spike_width)
-                end_idx = min(num_samples, spike_pos + spike_width)
-                synthetic_eeg[ch, start_idx:end_idx] += spike_amp
-        
-        return synthetic_eeg
+        return np.zeros((16, 100))  # Return empty array instead of synthetic data
 
     def update_neural_network(self, mode: str, progress: float, band_powers: np.ndarray, thought: str):
         """Update neural network visualization with training or prediction activity."""
